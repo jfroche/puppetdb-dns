@@ -1,4 +1,4 @@
-= PuppetDB-dns
+# PuppetDB-dns
 
 Query puppet [facts](https://docs.puppet.com/facter) from [PuppetDB](https://docs.puppet.com/puppetdb/)
 through a DNS interface.
@@ -9,7 +9,7 @@ E.g. give me the servers with the `app1` role in datacenter `brussels` should be
 
 ```
 # host app1.brussels.puppetdb
-app1.puppetdb has address 192.168.99.1
+app1.brussels.puppetdb has address 192.168.99.1
 ```
 
 But you might want as well query nodes using other facts. That's why we made a configuration file that list the combinations
@@ -18,7 +18,7 @@ of facts that can be used together:
 ```yaml
 domain: puppetdb
 bind: 127.0.0.1
-port: 53
+port: 5353
 ttl: 86400
 verbose: true
 puppetdb: http://puppetdb.prd.srv.mycompany.be:8080
@@ -29,34 +29,43 @@ hierarchy:
   - [subgroup, role, zone, hostgroup]
 ```
 
+Every part of the subdomain will be mapped to each element of the hierachy. So if we query `app1.brussels.puppetdb`, with the previous confiugration file, there will be two queries on puppetdb:
+
+ 1. `["and", ["=", ["fact", "role"], "app1"], ["=", ["fact", "datacenter"], "brussels"]]`
+ 2. `["and", ["=", ["fact", "subgroup"], "app1"], ["=", ["fact", "zone"], "brussels"]]`
+
 ## Installation
 
-The easiest way to install is to:
+The easiest way to install is to run:
 
-```bash
-go get github.com/jfroche/puppetdb-dns
-go install github.com/jfroche/puppetdb-dns
+```shell
+$ go get github.com/jfroche/puppetdb-dns
+$ go install github.com/jfroche/puppetdb-dns
 ```
 
 ## Usage
 
-To specify a configuration file:
+To run `puppetdb-dns` with a configuration file:
 
-```
-# puppetdb-dns -conf dns.conf
-```
-
-and
-
-```
-# puppetdb-dns
+```shell
+$ puppetdb-dns -conf dns.conf
 ```
 
-will load dns.conf by default.
+To run `puppetdb-dns` with `dns.conf` as default configuration file:
+
+```shell
+$ puppetdb-dns
+```
+
+You can query your local `puppetdb-dns` using dig:
+
+```shell
+$ dig @localhost -p 5353 novac.site.prod.plone.cicd
+```
 
 ## Configuration file
 
-The yaml file should contain these keys:
+The yaml configuration file should contain these keys:
 
  - domain (text): the domain that the dns server answer to
  - bind (text): network ip the dns server listen to
@@ -68,12 +77,12 @@ The yaml file should contain these keys:
 
 ## Docker
 
-puppetdb-dns can be run using docker.
+`puppetdb-dns` can be run using docker.
 
-Create dns.conf file and run:
+Create your dns.conf file and run:
 
-```
-docker run -p 53:53 -v $(pwd)/dns.conf:/go/dns.conf jfroche/puppetdb-dns
+```shell
+$ docker run -p 53:53 -v $(pwd)/dns.conf:/go/dns.conf jfroche/puppetdb-dns
 ```
 
 ### Based on:
