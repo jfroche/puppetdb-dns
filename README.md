@@ -1,4 +1,5 @@
 # PuppetDB-dns
+[![Build Status](https://travis-ci.org/jfroche/puppetdb-dns.png)](https://travis-ci.org/jfroche/puppetdb-dns)
 
 Query puppet [facts](https://docs.puppet.com/facter) from [PuppetDB](https://docs.puppet.com/puppetdb/)
 through a DNS interface.

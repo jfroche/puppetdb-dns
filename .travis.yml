@@ -1,0 +1,14 @@
+language: go
+install: make get
+go:
+  - 1.6.3
+before_deploy: "make release"
+deploy:
+  provider: releases
+  api_key: "$GH_TOKEN"
+  file:
+  - release/puppetdb-dns-linux-amd64
+  - release/puppetdb-dns-linux-386
+  skip_cleanup: true
+  on:
+    tags: true
