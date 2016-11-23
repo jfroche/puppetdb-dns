@@ -1,0 +1,6 @@
+Dockerfile
+Makefile
+.git
+.gitignore
+LICENCE
+puppetdb-dns
