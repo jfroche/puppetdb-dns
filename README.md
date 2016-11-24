@@ -90,7 +90,7 @@ The yaml configuration file should contain these keys:
 Create your dns.conf file and run:
 
 ```shell
-$ docker run -p 53:53 -v $(pwd)/dns.conf:/go/dns.conf jfroche/puppetdb-dns
+$ docker run --rm -p 5353:5353 -v $(pwd)/dns.conf:/go/dns.conf jfroche/puppetdb-dns
 ```
 
 ### Based on:
