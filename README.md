@@ -40,6 +40,13 @@ Every part of the subdomain will be mapped to each element of the hierachy. So i
 The easiest way to install is to run:
 
 ```shell
+$ curl -L https://github.com/jfroche/puppetdb-dns/releases/download/0.1/puppetdb-dns-linux-amd64 > puppetdb-dns
+$ chmod +x puppetdb-dns
+```
+
+If you have go on your machine:
+
+```shell
 $ go get github.com/jfroche/puppetdb-dns
 $ go install github.com/jfroche/puppetdb-dns
 ```
