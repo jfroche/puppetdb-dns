@@ -1,5 +1,5 @@
 test:
-	go test
+	go test -v
 
 get:
 	go get github.com/miekg/dns
