@@ -111,24 +111,25 @@ func (p PuppetDnsServer) handleRequest(w dns.ResponseWriter, r *dns.Msg) {
 		args := strings.Split(subdomain, ".")
 		args = args[:len(args)-2]
 		for _, facts := range p.Hierarchy {
-			if len(facts) == len(args) {
+			if len(facts) == len(args) && len(m.Answer) == 0 {
 				query["query"] = buildPuppetDbQuery(facts, args)
 				if p.Verbose {
 					fmt.Printf("Sending puppetdb query: %s\n", query["query"])
 				}
 				client.Get(&ret, "nodes", query)
-			}
-		}
-		for _, node := range ret {
-			ips, _ := net.LookupHost(node.Name)
-			for _, ip := range ips {
-				rr1 := new(dns.A)
-				rr1.Hdr = dns.RR_Header{Name: domain, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: uint32(ttl)}
-				rr1.A = net.ParseIP(ip)
-				m.Answer = append(m.Answer, dns.RR(rr1))
-				if p.Verbose {
-					fmt.Printf("dns answer: %s\n", ip)
+				for _, node := range ret {
+					ips, _ := net.LookupHost(node.Name)
+					for _, ip := range ips {
+						rr1 := new(dns.A)
+						rr1.Hdr = dns.RR_Header{Name: domain, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: uint32(ttl)}
+						rr1.A = net.ParseIP(ip)
+						m.Answer = append(m.Answer, dns.RR(rr1))
+						if p.Verbose {
+							fmt.Printf("dns answer: %s\n", ip)
+						}
+					}
 				}
+
 			}
 		}
 	}

@@ -131,3 +131,51 @@ func TestQueryNodes(t *testing.T) {
 	}
 
 }
+
+func TestMatchFirstItemInHierarychy(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v3/nodes",
+		func(w http.ResponseWriter, r *http.Request) {
+			puppetdb_query := r.URL.Query()["query"][0]
+			if puppetdb_query == `["and", ["=", ["fact", "role"], "webserver"], ["=", ["fact", "hostgroup"], "linux"]]` {
+				fmt.Fprint(w, `[{"name":"affinitic.be",
+							 "dactivated":null,
+							 "catalog_timestamp" : "2014-01-10T21:17:03.467Z",
+							 "facts_timestamp" : "2014-01-10T21:15:40.933Z",
+							 "report_timestamp" : "2014-01-10T21:17:30.877Z" }]`)
+			} else {
+				fmt.Fprint(w, "")
+			}
+		})
+
+	dns.HandleFunc("puppet.be.", dnsserver.handleRequest)
+	defer dns.HandleRemove("puppet.be.")
+	m1 := new(dns.Msg)
+	m1.SetQuestion("webserver.linux.puppet.be.", dns.TypeA)
+
+	s, addrstr, err := RunLocalUDPServer("127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("unable to run test server: %s", err)
+	}
+	defer s.Shutdown()
+
+	c := new(dns.Client)
+	r, _, err := c.Exchange(m1, addrstr)
+	if err != nil {
+		t.Errorf("failed to exchange: %v", err)
+	}
+	if r != nil && r.Rcode != dns.RcodeSuccess {
+		t.Errorf("failed to get an valid answer\n%v", r)
+	}
+	if len(r.Answer) != 1 {
+		t.Errorf("answer has wrong size\n%v", r)
+	}
+	if r, ok := r.Answer[0].(*dns.A); ok {
+		if r.A.String() != "91.121.100.12" {
+			t.Errorf("wrong dns response", r.A)
+		}
+
+	}
+}
