@@ -28,6 +28,7 @@ func setup() {
 		"12345",
 		"127.0.0.1",
 		serverUrl.String(),
+		600,
 		true,
 		[][]string{[]string{"role", "hostgroup"}, []string{"role", "os"}},
 	}
@@ -127,7 +128,9 @@ func TestQueryNodes(t *testing.T) {
 		if r.A.String() != "91.121.100.12" {
 			t.Errorf("wrong dns response", r.A)
 		}
-
+		if r.Header().Ttl != 600 {
+			t.Errorf("wrong ttl", r.Header().Ttl)
+		}
 	}
 
 }
@@ -176,6 +179,8 @@ func TestMatchFirstItemInHierarychy(t *testing.T) {
 		if r.A.String() != "91.121.100.12" {
 			t.Errorf("wrong dns response", r.A)
 		}
-
+		if r.Header().Ttl != 600 {
+			t.Errorf("wrong ttl", r.Header().Ttl)
+		}
 	}
 }

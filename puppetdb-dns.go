@@ -16,7 +16,6 @@ import (
 )
 
 var ipv4, conf string
-var ttl int
 var logflag bool
 var mapv4 map[string]string
 
@@ -31,6 +30,7 @@ type PuppetDnsServer struct {
 	Port      string
 	Bind      string
 	Puppetdb  string
+	Ttl       int
 	Verbose   bool
 	Hierarchy [][]string
 }
@@ -121,7 +121,7 @@ func (p PuppetDnsServer) handleRequest(w dns.ResponseWriter, r *dns.Msg) {
 					ips, _ := net.LookupHost(node.Name)
 					for _, ip := range ips {
 						rr1 := new(dns.A)
-						rr1.Hdr = dns.RR_Header{Name: domain, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: uint32(ttl)}
+						rr1.Hdr = dns.RR_Header{Name: domain, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: uint32(p.Ttl)}
 						rr1.A = net.ParseIP(ip)
 						m.Answer = append(m.Answer, dns.RR(rr1))
 						if p.Verbose {

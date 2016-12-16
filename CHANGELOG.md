@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3 (2016-12-16)
+
+- Fix TTL assignation
+
 ## 0.2 (2016-12-04)
 
 - Limit response to the first one that match the hierarchy
